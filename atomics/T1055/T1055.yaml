@@ -51,7 +51,7 @@ atomic_tests:
 
 - name: Shared Library Injection via /etc/ld.so.preload
   description: |
-    This test adds a shared library to the `ld.so.preload` list to execute and intercept API calls. This technique was used by threat actor Rocke during the exploitation of Linux web servers. This requires the `glibc` package.
+    This test adds a shared library to the `ld.so.preload` list to execute and intercept API calls. This technique was used by threat actor Rocke during the exploitation of Linux web servers. This requires the `glibc` package. 
   supported_platforms:
     - linux
   input_arguments:
